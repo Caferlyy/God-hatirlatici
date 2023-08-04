@@ -23,25 +23,39 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_godel", GodEL);
 	godluel_hatirlat = CreateConVar("sm_god_timer", "10", "Kaç dakika arayla komutçuya sorsun?", FCVAR_NOTIFY, true, 1.0);
 	CreateTimer(134.0, godhatirlatici, _,TIMER_REPEAT);
+	AutoExecConfig(true, "Godlu-El-Ayarlari", "Caferly");
 } 
 
 public Action:godhatirlatici(Handle:timer,client)
 {
-	Event newevent_message = CreateEvent("cs_win_panel_round");
+
+PrintToChatAll(" \x05[SM] \x0E!godel \x06yazarak \x0Egodlu el oynatmak için \x05god alabilirsiniz.");
+if (warden_iswarden(client))
+	{           
+			Event newevent_message = CreateEvent("cs_win_panel_round");
 newevent_message.SetString("funfact_token", "<font class='fontSize-xxl'><font color='#FF5733'>!godel</font><font color='#FF0000'> yazarak godlu el alabilirsiniz.</font>");
 
 for(int z = 1; z <= MaxClients; z++)
   if(IsClientInGame(z) && !IsFakeClient(z))
     newevent_message.FireToClient(z);
-if (warden_iswarden(client))
-	{           
+
+newevent_message.Cancel(); 
+            CreateTimer(5.0, RemoveWelcomeMessage, client);
            Bilgi(client);
            }
-newevent_message.Cancel(); 
-PrintToChatAll(" \x05[SM] \x0E!godel \x06yazarak \x0Egodlu el oynatmak için \x05god alabilirsiniz.");
 	return Plugin_Continue;
 }
 
+public Action RemoveWelcomeMessage(Handle timer, int client)
+{
+      
+       Event newevent_round = CreateEvent("round_start");
+    for(int z = 1; z <= MaxClients; z++)
+      if(IsClientInGame(z) && !IsFakeClient(z))
+        newevent_round.FireToClient(z);
+
+    newevent_round.Cancel(); 
+} 
 Bilgi(client)
 {
 		Menu menu = new Menu(Menu_Callback);
@@ -71,10 +85,12 @@ newevent_message.SetString("funfact_token", "<font class='fontSize-xxl'><font co
 for(int z = 1; z <= MaxClients; z++)
   if(IsClientInGame(z) && !IsFakeClient(z))
     newevent_message.FireToClient(z);
-                                
+               CreateTimer(5.0, RemoveWelcomeMessage, client);                             
 newevent_message.Cancel(); 
+
 		PrintToChatAll("[SM] \x0BKomutçu \x04Diğer elin \x02god \x04olmasını istedi!", client);
 	}
+
 		}
 		else if (StrEqual(Item, "2", true))
 		{
@@ -87,37 +103,31 @@ for(int z = 1; z <= MaxClients; z++)
     newevent_message.FireToClient(z);
                                 
 newevent_message.Cancel(); 
+            CreateTimer(5.0, RemoveWelcomeMessage, client);
 		PrintToChatAll("[SM] \x0BKomutçu \x04Diğer elin \x02god \x04olmasını istemedi!");
 			Delaytimer[client] = CreateTimer(godluel_hatirlat.FloatValue * 60.0, DelaySOR, client, TIMER_FLAG_NO_MAPCHANGE);
 			PrintToChat(client, "[SM] \x04%d dakika \x01sonra tekrar sorulacak.", godluel_hatirlat.IntValue);
 		}
+
 		delete menu;
 	}
 } 
 public void warden_OnWardenCreated(int client)
 {
 	Delaytimer[client] = CreateTimer(godluel_hatirlat.FloatValue * 60.0, DelaySOR, client, TIMER_FLAG_NO_MAPCHANGE);
+
 }				   
 
 public Action DelaySOR(Handle timer, int client)
 {
 		Bilgi(client);
+
 }
 public Action GodEL(int client, int args)
 {
 	if (warden_iswarden(client))
 	{
-		
-
-		Event newevent_message = CreateEvent("cs_win_panel_round");
-newevent_message.SetString("funfact_token", "<font class='fontSize-xxl'><font color='#FF5733'>Komutçu</font><font color='#6BFF33'> Diğer elin godlu olmasını istedi.</font>");
-
-for(int z = 1; z <= MaxClients; z++)
-  if(IsClientInGame(z) && !IsFakeClient(z))
-    newevent_message.FireToClient(z);
-                                
-newevent_message.Cancel(); 
-		PrintToChatAll("[SM] \x0BKomutçu \x04Diğer elin \x02god \x04olmasını istedi!", client);
+		Bilgi(client);
 	}
 }
 
